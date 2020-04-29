@@ -34,15 +34,17 @@ import logging
 import sys
 import numpy as np
 from keras.models import Model
-from keras.layers import Input, Activation, add, Dense, Flatten, Dropout, Multiply, Embedding, Lambda, Add, Concatenate, Activation
+from keras.layers import Input, Activation, add, Dense, Flatten, Dropout, Multiply, Embedding, Lambda, Add, Concatenate, \
+    Activation
 from keras.layers.convolutional import Conv2D, AveragePooling2D, MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
 from keras import backend as K
-from keras.optimizers import SGD,Adam
+from keras.optimizers import SGD, Adam
 from keras.utils import plot_model
 from keras.engine.topology import Layer
 from keras import activations, initializers, regularizers, constraints
+from keras.callbacks import ModelCheckpoint
 
 x = np.array(x)
 y = np.array(y)
@@ -205,9 +207,10 @@ class SSR_net:
 
         return model
 
-ssrnet = SSR_net(image_size=200,stage_num=[3,3,3],lambda_local=0.25,lambda_d=0.25)()
 
-ssrnet.compile(optimizer=Adam(), loss=["mae"], metrics={'pred_a':'mae'})
+ssrnet = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
+
+ssrnet.compile(optimizer=Adam(), loss=["mae"], metrics={'pred_a': 'mae'})
 
 ssrnet.summary()
 
@@ -227,6 +230,9 @@ y_test = y[train_num:]
 x = 0
 y = 0
 
-hist = ssrnet.fit(x_train, y_train,batch_size = 50,
-                                   validation_data=(x_test, y_test),
-                                   epochs=50, verbose=1)
+filepath = "../output/weights-improvement-{epoch:02d}-{val_loss:.2f}.h5"
+checkpoint = ModelCheckpoint(filepath=filepath, monitor='val_loss', verbose=1, save_best_only=True)
+callbacks_list = [checkpoint]
+hist = ssrnet.fit(x_train, y_train, batch_size=50,
+                  validation_data=(x_test, y_test),
+                  epochs=50, verbose=1, callbacks=callbacks_list)
