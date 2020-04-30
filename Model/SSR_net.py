@@ -12,7 +12,6 @@ from keras.optimizers import SGD, Adam
 from keras.utils import plot_model
 from keras.engine.topology import Layer
 from keras import activations, initializers, regularizers, constraints
-from keras.callbacks import ModelCheckpoint
 
 class SSR_net:
     def __init__(self, image_size, stage_num, lambda_local, lambda_d):
