@@ -4,6 +4,7 @@ import timeit
 import numpy as np
 from Model.SSR_net import SSR_net
 import keras
+import matplotlib.image as mpimg
 
 model = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
 model.load_weights('../output/weights-improvement-44-6.48.h5')
@@ -18,16 +19,11 @@ except OSError:
 # load model and weights
 img_size = (200, 200)
 stage_num = [3, 3, 3]
-lambda_local = 1
-lambda_d = 1
 cap = cv2.VideoCapture(0)
 img_idx = 0
-detected = ''  # make this not local variable
-time_detection = 0
-time_network = 0
-time_plot = 0
+# detected = ''  # make this not local variable
 skip_frame = 5  # every 5 frame do 1 detection and network forward propagation
-ad = 1
+ad = 0.5
 
 
 def draw_label(input_img, loc, label):
@@ -53,7 +49,8 @@ def draw_faces(detected, input_img, ad, img_size, model: keras.Model):
         yw2 = min(int(y_2 + ad * h), img_h - 1)
 
         faces = np.zeros(shape=(len(detected), img_size[0], img_size[1], 3))
-        faces[i, :, :, :] = cv2.resize(input_img[yw1: yw2 + 1, xw1: xw2 + 1, :], img_size)
+        faces[i, :, :, :] = cv2.resize(input_img[yw1: yw2 + 1, xw1: xw2 + 1, :], img_size) / 255
+        # faces[i, :, :, :] = mpimg.imread(temp)
         # faces[i, :, :, :] = cv2.normalize(faces[i, :, :, :], None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
 
         cv2.rectangle(input_img, (x_1, y_1), (x_2, y_2), (255, 0, 0), 2)
@@ -71,7 +68,7 @@ def draw_faces(detected, input_img, ad, img_size, model: keras.Model):
         age_label = str(int(ages_pred[i]))
         draw_label(input_img=input_img, loc=(x_1, y_1), label=age_label)
 
-    cv2.imshow('result', input_img)
+    # cv2.imshow('result', input_img)
     return input_img
 
 
@@ -83,17 +80,12 @@ if __name__ == '__main__':
         img_h, img_w, _ = np.shape(input_img)
 
         if img_idx == 1 or img_idx % skip_frame == 0:
-            time_detection = 0
-            time_network = 0
-            time_plot = 0
-
             # detect faces using LBP detector
             gray_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2GRAY)
             start_time = timeit.default_timer()
             detected = face_cascade.detectMultiScale(gray_img, 1.1)
 
             print(detected)
-            elapsed_time = timeit.default_timer() - start_time
-            time_detection = time_detection + elapsed_time
+
             input_img = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
             cv2.imwrite('img/' + str(img_idx) + '.png', input_img)
