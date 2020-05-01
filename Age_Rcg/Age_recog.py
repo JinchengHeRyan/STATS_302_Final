@@ -1,10 +1,7 @@
 import cv2
 import os
-import timeit
-import numpy as np
 from Model.SSR_net import SSR_net
-import keras
-from Age_Rcg.funcs.assist_func import draw_label, draw_faces, face_count
+from Age_Rcg.funcs.assist_func import draw_faces, face_count
 import time
 
 model = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
@@ -12,9 +9,6 @@ model.load_weights('../Output/output_2/weights-improvement-21-11.71.h5')
 
 
 face_cascade = cv2.CascadeClassifier('lbpcascade_frontalface_improved.xml')
-
-
-# load model and weights
 
 
 def realtime_recog():
@@ -72,5 +66,5 @@ if __name__ == '__main__':
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = '11665.jpg'
+        input_file_path = '7.png'
         static_recog(input_file_path)
