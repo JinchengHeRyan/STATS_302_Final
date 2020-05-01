@@ -8,7 +8,7 @@ from Age_Rcg.funcs.assist_func import draw_label, draw_faces, face_count
 import time
 
 model = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
-model.load_weights('../Output/output_1/weights-improvement-44-6.48.h5')
+model.load_weights('../Output/output_2/weights-improvement-21-11.71.h5')
 
 
 face_cascade = cv2.CascadeClassifier('lbpcascade_frontalface_improved.xml')
