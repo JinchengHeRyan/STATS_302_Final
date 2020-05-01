@@ -9,7 +9,7 @@ import random
 
 
 def data_loader_2():
-    path = "../input/age"
+    path = "../data/age"
     age_list = os.listdir(path)
     num_each_folder = 200
     y = list()

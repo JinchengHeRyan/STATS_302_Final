@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.image as mpimg
 
 def data_loader():
-    path = "../input/facial-age/face_age"
+    path = "../data/facial-age/face_age"
     age_list = os.listdir(path)
     # set up the output of y
     y = list()
