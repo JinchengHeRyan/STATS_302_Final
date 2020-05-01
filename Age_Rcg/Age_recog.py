@@ -4,11 +4,12 @@ import timeit
 import numpy as np
 from Model.SSR_net import SSR_net
 import keras
-from Age_Rcg.funcs.assist_func import draw_label, draw_faces
+from Age_Rcg.funcs.assist_func import draw_label, draw_faces, face_count
 import time
 
 model = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
 model.load_weights('../Output/output_1/weights-improvement-44-6.48.h5')
+
 
 face_cascade = cv2.CascadeClassifier('lbpcascade_frontalface_improved.xml')
 
@@ -42,7 +43,8 @@ def realtime_recog():
             gray_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2GRAY)
             detected = face_cascade.detectMultiScale(gray_img, 1.1)
 
-            print(detected)
+            print("Detected {} faces! ".format(face_count(detected)) if face_count(detected) > 0 else "Detect No Faces! ")
+
             input_img = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
             cv2.imwrite(img_out_path + '/' + str(img_idx) + '.png', input_img)
 
@@ -56,7 +58,7 @@ def static_recog(input_img_path: str):
     input_img = cv2.imread(input_img_path)
     gray_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2GRAY)
     detected = face_cascade.detectMultiScale(gray_img, 1.1)
-    print(detected)
+    print("Detected {} faces! ".format(face_count(detected)) if face_count(detected) > 0 else "Detect No Faces! ")
 
     ad = 0.5
     img_size = (200, 200)
@@ -65,7 +67,7 @@ def static_recog(input_img_path: str):
 
 
 if __name__ == '__main__':
-    Mode = 1        # 0 is real time mode, 1 is static mode
+    Mode = 0        # 0 is real time mode, 1 is static mode
 
     if Mode == 0:
         realtime_recog()

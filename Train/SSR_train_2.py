@@ -38,4 +38,4 @@ hist = ssrnet.fit(x_train, y_train, batch_size=50,
                   validation_data=(x_test, y_test),
                   epochs=50, verbose=1, callbacks=callbacks_list)
 
-np.save('../Output/output_2/hist.npy', hist, allow_pickle=True)
+np.save('../Output/output_2/hist.npy', hist.history, allow_pickle=True)

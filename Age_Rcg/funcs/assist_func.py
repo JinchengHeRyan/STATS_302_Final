@@ -3,6 +3,10 @@ import keras
 import numpy as np
 
 
+def face_count(detected):
+    return len(detected)
+
+
 def draw_label(input_img, loc, label):
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 1
