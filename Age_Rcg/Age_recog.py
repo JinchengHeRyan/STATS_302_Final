@@ -65,14 +65,14 @@ def static_recog(input_img_path: str):
     if face_count(detected) > 0:
         print('\t' + ages_output + 'years old')
 
-    cv2.imwrite(img_out_path + '/' + 'static' + '.png', input_img)
+    cv2.imwrite(img_out_path + '/' + str(int(time.time())) + '.png', input_img)
 
 
 if __name__ == '__main__':
-    Mode = 0        # 0 is real time mode, 1 is static mode
+    Mode = 1        # 0 is real time mode, 1 is static mode
 
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = '1.jpg'
+        input_file_path = '2.jpeg'
         static_recog(input_file_path)
