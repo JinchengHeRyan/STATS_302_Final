@@ -40,6 +40,11 @@ def draw_faces(detected, input_img, ad, img_size, model: keras.Model):
 
     if len(detected) > 0:
         ages_pred = model.predict(faces)
+        ages_output = str()
+        for i in range(len(ages_pred)):
+            ages_output += str(int(ages_pred[i])) + ' '
+    else:
+        ages_output = None
 
     for i, (x, y, w, h) in enumerate(detected):
         x_1 = x
@@ -51,4 +56,5 @@ def draw_faces(detected, input_img, ad, img_size, model: keras.Model):
         draw_label(input_img=input_img, loc=(x_1, y_1), label=age_label)
 
     # cv2.imshow('result', input_img)
-    return input_img
+
+    return input_img, ages_output

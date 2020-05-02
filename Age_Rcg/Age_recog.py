@@ -1,5 +1,3 @@
-import sys
-sys.path.append('../')
 import cv2
 import os
 from Model.SSR_net import SSR_net
@@ -41,7 +39,11 @@ def realtime_recog():
 
             print("Detected {} faces! ".format(face_count(detected)) if face_count(detected) > 0 else "Detect No Faces! ")
 
-            input_img = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
+            input_img, ages_output = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
+
+            if face_count(detected)> 0:
+                print('\t' + ages_output + 'years old')
+
             cv2.imwrite(img_out_path + '/' + str(img_idx) + '.png', input_img)
 
 
@@ -58,7 +60,11 @@ def static_recog(input_img_path: str):
 
     ad = 0.5
     img_size = (200, 200)
-    input_img = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
+    input_img, ages_output = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
+
+    if face_count(detected) > 0:
+        print('\t' + ages_output + 'years old')
+
     cv2.imwrite(img_out_path + '/' + 'static' + '.png', input_img)
 
 
@@ -68,5 +74,5 @@ if __name__ == '__main__':
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = '1.jpeg'
+        input_file_path = '1.jpg'
         static_recog(input_file_path)
