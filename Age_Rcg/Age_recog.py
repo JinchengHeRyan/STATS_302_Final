@@ -74,5 +74,5 @@ if __name__ == '__main__':
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = '2.jpeg'
+        input_file_path = '8.jpeg'
         static_recog(input_file_path)
