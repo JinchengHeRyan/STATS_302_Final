@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../')
 import cv2
 import os
 from Model.SSR_net import SSR_net
