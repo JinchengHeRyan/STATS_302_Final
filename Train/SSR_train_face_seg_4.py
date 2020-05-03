@@ -41,7 +41,7 @@ filepath = output_path + "/weights-improvement-{epoch:02d}-{val_loss:.2f}.h5"
 checkpoint = ModelCheckpoint(filepath=filepath, monitor='val_loss', verbose=1, save_best_only=True)
 callbacks_list = [checkpoint]
 hist = ssrnet.fit(x, y, batch_size=50,
-                  epochs=1, verbose=1, callbacks=callbacks_list,
+                  epochs=50, verbose=1, callbacks=callbacks_list,
                   shuffle=True, validation_split=0.3)
 
 np.save(output_path+'/hist.npy', hist.history, allow_pickle=True)
