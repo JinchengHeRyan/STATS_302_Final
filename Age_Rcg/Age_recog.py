@@ -5,7 +5,7 @@ from Age_Rcg.funcs.assist_func import draw_faces, face_count
 import time
 
 model = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
-model.load_weights('../Output/output_3/weights-improvement-24-8.21.h5')
+model.load_weights('../Output/output_4/weights-improvement-50-10.05.h5')
 
 
 face_cascade = cv2.CascadeClassifier('lbpcascade_frontalface_improved.xml')
@@ -24,7 +24,7 @@ def realtime_recog():
 
     # detected = ''  # make this not local variable
     skip_frame = 5  # every 5 frame do 1 detection and network forward propagation
-    ad = 0.5
+    ad = 0.25
 
     img_idx = 0
     while True:
@@ -58,7 +58,7 @@ def static_recog(input_img_path: str):
     detected = face_cascade.detectMultiScale(gray_img, 1.1)
     print("Detected {} faces! ".format(face_count(detected)) if face_count(detected) > 0 else "Detect No Faces! ")
 
-    ad = 0.5
+    ad = 0.25
     img_size = (200, 200)
     input_img, ages_output = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
 
@@ -69,10 +69,10 @@ def static_recog(input_img_path: str):
 
 
 if __name__ == '__main__':
-    Mode = 0        # 0 is real time mode, 1 is static mode
+    Mode = 1        # 0 is real time mode, 1 is static mode
 
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = '8.jpeg'
+        input_file_path = '6.jpeg'
         static_recog(input_file_path)

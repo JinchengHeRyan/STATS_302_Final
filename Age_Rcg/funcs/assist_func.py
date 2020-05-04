@@ -32,8 +32,8 @@ def draw_faces(detected, input_img, ad, img_size, model: keras.Model):
         yw2 = min(int(y_2 + ad * h), img_h - 1)
 
         faces = np.zeros(shape=(len(detected), img_size[0], img_size[1], 3))
-        # faces[i, :, :, :] = cv2.resize(input_img[yw1: yw2 + 1, xw1: xw2 + 1, :], img_size) / 255
-        faces[i, :, :, :] = cv2.resize(input_img[y_1: y_2 + 1, x_1: x_2 + 1, :], img_size) / 255
+        faces[i, :, :, :] = cv2.resize(input_img[yw1: yw2 + 1, xw1: xw2 + 1, :], img_size) / 255
+        # faces[i, :, :, :] = cv2.resize(input_img[y_1: y_2 + 1, x_1: x_2 + 1, :], img_size) / 255
 
         cv2.rectangle(input_img, (x_1, y_1), (x_2, y_2), (255, 0, 0), 2)
         cv2.rectangle(input_img, (xw1, yw1), (xw2, yw2), (0, 0, 255), 2)
