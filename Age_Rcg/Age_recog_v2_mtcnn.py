@@ -4,11 +4,14 @@ sys.path.append('../')
 import cv2
 import os
 from Model.SSR_net import SSR_net
+from Model.mtcnn.mtcnn_model import mtcnn
 from Age_Rcg.funcs.assist_func import draw_faces, face_count, mtcnn_detect
 import time
 
-# model = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
-# model.load_weights('../Output/output_3/weights-improvement-24-8.21.h5')
+model_SSR = SSR_net(image_size=200, stage_num=[3, 3, 3], lambda_local=0.25, lambda_d=0.25)()
+model_SSR.load_weights('../Output/output_3/weights-improvement-24-8.21.h5')
+
+model_mtcnn = mtcnn()
 
 
 # face_cascade = cv2.CascadeClassifier('lbpcascade_frontalface_improved.xml')
@@ -35,22 +38,17 @@ def realtime_recog():
         img_idx += 1
 
         if img_idx == 1 or img_idx % skip_frame == 0:
-            # detect faces using LBP detector
-            # gray_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2GRAY)
-            # detected = face_cascade.detectMultiScale(gray_img, 1.1)
 
-            detected, ages_output = mtcnn_detect(input_img, img_size)
+            face_num, ages_output = mtcnn_detect(input_img, img_size, model_mtcnn=model_mtcnn, model_SSR=model_SSR)
 
-            print("Detected {} faces! ".format(face_count(detected)) if face_count(detected) > 0 else "Detect No Faces! ")
+            print("Detected {} faces! ".format(face_num) if face_num > 0 else "Detect No Faces! ")
 
-            # input_img, ages_output = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
-
-            if face_count(detected) > 0:
+            if face_num > 0:
                 print('\t' + ages_output + 'years old')
 
             cv2.imwrite(img_out_path + '/' + str(img_idx) + '.png', input_img)
-            # cv2.imshow('result', input_img)
-            # cv2.waitKey(1)
+            cv2.imshow('result', input_img)
+            cv2.waitKey(1)
 
 
 def static_recog(input_img_path: str):
@@ -65,13 +63,11 @@ def static_recog(input_img_path: str):
 
     input_img = cv2.imread(input_img_path)
 
-    detected, ages_output = mtcnn_detect(input_img, img_size)
-    print("Detected {} faces! ".format(face_count(detected)) if face_count(detected) > 0 else "Detect No Faces! ")
+    face_num, ages_output = mtcnn_detect(input_img, img_size, model_mtcnn=model_mtcnn, model_SSR=model_SSR)
 
+    print("Detected {} faces! ".format(face_num) if face_num > 0 else "Detect No Faces! ")
 
-    # input_img, ages_output = draw_faces(detected=detected, input_img=input_img, ad=ad, img_size=img_size, model=model)
-
-    if face_count(detected) > 0:
+    if face_num > 0:
         print('\t' + ages_output + 'years old')
 
     cv2.imwrite(img_out_path + '/' + str(int(time.time())) + '.png', input_img)
@@ -83,5 +79,5 @@ if __name__ == '__main__':
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = '6.jpg'
+        input_file_path = '2.jpeg'
         static_recog(input_file_path)

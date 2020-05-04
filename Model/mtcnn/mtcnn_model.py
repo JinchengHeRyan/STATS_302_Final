@@ -1,16 +1,11 @@
 from keras.layers import Conv2D, Input, MaxPool2D, Reshape, Activation, Flatten, Dense, Permute
 from keras.layers.advanced_activations import PReLU
 from keras.models import Model, Sequential
-import tensorflow as tf
 import numpy as np
 from Model.mtcnn import utils
 import cv2
 
 
-# -----------------------------#
-#   粗略获取人脸框
-#   输出bbox位置和是否有人脸
-# -----------------------------#
 def create_Pnet(weight_path):
     input = Input(shape=[None, None, 3])
 
@@ -33,10 +28,7 @@ def create_Pnet(weight_path):
     return model
 
 
-# -----------------------------#
-#   mtcnn的第二段
-#   精修框
-# -----------------------------#
+# Second part of mtcnn
 def create_Rnet(weight_path):
     input = Input(shape=[24, 24, 3])
     # 24,24,3 -> 11,11,28
@@ -66,10 +58,7 @@ def create_Rnet(weight_path):
     return model
 
 
-# -----------------------------#
-#   mtcnn的第三段
-#   精修框并获得五个点
-# -----------------------------#
+# The third part of mtcnn, getting five points
 def create_Onet(weight_path):
     input = Input(shape=[48, 48, 3])
     # 48,48,3 -> 23,23,32
@@ -95,7 +84,6 @@ def create_Onet(weight_path):
     x = Dense(256, name='conv5')(x)
     x = PReLU(name='prelu5')(x)
 
-    # 鉴别
     # 256 -> 2 256 -> 4 256 -> 10 
     classifier = Dense(2, activation='softmax', name='conv6-1')(x)
     bbox_regress = Dense(4, name='conv6-2')(x)
@@ -114,22 +102,15 @@ class mtcnn():
         self.Onet = create_Onet('../Model/mtcnn/onet.h5')
 
     def detectFace(self, img, threshold):
-        # -----------------------------#
-        #   归一化
-        # -----------------------------#
+        # Normalization
         copy_img = (img.copy() - 127.5) / 127.5
         origin_h, origin_w, _ = copy_img.shape
-        # -----------------------------#
-        #   计算原始输入图像
-        #   每一次缩放的比例
-        # -----------------------------#
+
         scales = utils.calculateScales(img)
 
         out = []
-        # -----------------------------#
-        #   粗略计算人脸框
-        #   pnet部分
-        # -----------------------------#
+
+        # Pnet part
         for scale in scales:
             hs = int(origin_h * scale)
             ws = int(origin_w * scale)
@@ -141,30 +122,26 @@ class mtcnn():
         image_num = len(scales)
         rectangles = []
         for i in range(image_num):
-            # 有人脸的概率
+            # Probability of have faces
             cls_prob = out[i][0][0][:, :, 1]
-            # 其对应的框的位置
+            # The location of triangle
             roi = out[i][1][0]
 
-            # 取出每个缩放后图片的长宽
             out_h, out_w = cls_prob.shape
             out_side = max(out_h, out_w)
-            # print(cls_prob.shape)
-            # 解码过程
+
+            # Decode
             rectangle = utils.detect_face_12net(cls_prob, roi, out_side, 1 / scales[i], origin_w, origin_h,
                                                 threshold[0])
             rectangles.extend(rectangle)
 
-        # 进行非极大抑制
+        # Non-maximum suppression
         rectangles = utils.NMS(rectangles, 0.7)
 
         if len(rectangles) == 0:
             return rectangles
 
-        # -----------------------------#
-        #   稍微精确计算人脸框
-        #   Rnet部分
-        # -----------------------------#
+        # Rnet part
         predict_24_batch = []
         for rectangle in rectangles:
             crop_img = copy_img[int(rectangle[1]):int(rectangle[3]), int(rectangle[0]):int(rectangle[2])]
@@ -183,10 +160,8 @@ class mtcnn():
         if len(rectangles) == 0:
             return rectangles
 
-        # -----------------------------#
-        #   计算人脸框
-        #   onet部分
-        # -----------------------------#
+        # Onet part
+
         predict_batch = []
         for rectangle in rectangles:
             crop_img = copy_img[int(rectangle[1]):int(rectangle[3]), int(rectangle[0]):int(rectangle[2])]
