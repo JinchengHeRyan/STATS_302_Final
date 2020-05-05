@@ -79,6 +79,6 @@ if __name__ == '__main__':
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = ['7.png']
+        input_file_path = ['1.jpeg']
         for path in input_file_path:
             static_recog(path)
