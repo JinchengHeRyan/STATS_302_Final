@@ -74,11 +74,11 @@ def static_recog(input_img_path: str):
 
 
 if __name__ == '__main__':
-    Mode = 1        # 0 is real time mode, 1 is static mode
+    Mode = 0        # 0 is real time mode, 1 is static mode
 
     if Mode == 0:
         realtime_recog()
     else:
-        input_file_path = ['8.png']
+        input_file_path = ['7.png']
         for path in input_file_path:
             static_recog(path)

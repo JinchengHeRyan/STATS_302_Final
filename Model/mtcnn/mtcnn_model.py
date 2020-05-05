@@ -20,7 +20,6 @@ def create_Pnet(weight_path):
     x = PReLU(shared_axes=[1, 2], name='PReLU3')(x)
 
     classifier = Conv2D(2, (1, 1), activation='softmax', name='conv4-1')(x)
-    # 无激活函数，线性。
     bbox_regress = Conv2D(4, (1, 1), name='conv4-2')(x)
 
     model = Model([input], [classifier, bbox_regress])
