@@ -1,8 +1,7 @@
 import cv2
 import keras
 import numpy as np
-from Model.mtcnn.mtcnn_model import mtcnn
-from Model.SSR_net import SSR_net
+from Model.migration_model.migration import find_mig
 
 
 def face_count(detected):
@@ -42,11 +41,13 @@ def draw_faces(detected, input_img, ad, img_size, model: keras.Model):
 
     if len(detected) > 0:
         ages_pred = model.predict(faces)
-        ages_output = str()
-        for i in range(len(ages_pred)):
-            ages_output += str(int(ages_pred[i])) + ' '
-    else:
-        ages_output = None
+    #     ages_output = str()
+    #     for i in range(len(ages_pred)):
+    #         ages_output += str(int(ages_pred[i])) + ' '
+    # else:
+    #     ages_output = None
+
+    ages_output = str()
 
     for i, (x, y, w, h) in enumerate(detected):
         x_1 = x
@@ -54,8 +55,9 @@ def draw_faces(detected, input_img, ad, img_size, model: keras.Model):
         x_2 = x + w
         y_2 = y + h
 
-        age_label = str(int(ages_pred[i]))
+        age_label = str(int(ages_pred[i])) + find_mig(prediction=int(ages_pred[i]), fig=faces[i].reshape(1, img_size[0], img_size[1], 3))
         draw_label(input_img=input_img, loc=(x_1, y_1), label=age_label)
+        ages_output += age_label + ' '
 
     # cv2.imshow('result', input_img)
 
@@ -86,12 +88,14 @@ def mtcnn_detect(img, img_size, model_mtcnn, model_SSR):
             face = face.reshape(1, img_size[0], img_size[1], 3)
 
             age = int(model_SSR.predict(face))
-            ages_output += str(age) + ' '
+
+            migration_output = find_mig(prediction=age, fig=face)
+            ages_output += str(age) + migration_output + ' '
 
             cv2.rectangle(img, (int(rectangle[0]), int(rectangle[1])), (int(rectangle[2]), int(rectangle[3])),
                           (255, 0, 0), 2)
 
-            draw_label(input_img=img, loc=(x_1, y_1), label=str(age))
+            draw_label(input_img=img, loc=(x_1, y_1), label=str(age)+migration_output)
 
             for i in range(5, 15, 2):
                 cv2.circle(img, (int(rectangle[i + 0]), int(rectangle[i + 1])), 2, (0, 255, 0))
